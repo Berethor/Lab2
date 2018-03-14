@@ -1,0 +1,29 @@
+#!/bin/bash
+
+gcc -c swap.c
+gcc -c main.c
+gcc -c revert_string.c
+gcc -o res2 swap.c main.c revert_string.c
+./res2 hiworld
+
+gcc -c       /projects/Lab2/src/revert_string/revert_string.c -o /projects/Lab2/src/revert_string.o
+gcc -c       /projects/Lab2/src/revert_string/swap.c -o /projects/Lab2/src/swap.o
+ar rcs /projects/Lab2/src/revert_string/librevert.a /projects/Lab2/src/revert_string.o /projects/Lab2/src/swap.o
+gcc  main.o -L/projects/Lab2/src/revert_string/ -lrevert -o /projects/Lab2/src/revert_string/statically-linked
+./statically-linked buysmth
+
+
+sudo gcc -c -fPIC revert_string.c -o /bin/shared/revert_string.o
+sudo gcc -c main.c -o /bin/shared/main.o
+sudo gcc -c -fPIC swap.c -o /bin/shared/swap.o
+sudo gcc  -shared /bin/shared/revert_string.o /bin/shared/swap.o -o /bin/shared/libshared.so
+sudo gcc  /bin/shared/main.o -L/bin/shared -lshared -o /bin/sharedlinked
+LD_LIBRARY_PATH=$(pwd)/bin/shared /bin/sharedlinked pwn
+
+sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
+sudo gcc -c -fPIC revert_string.c -o /bin/shared/revert_string.o
+sudo gcc -c /projects/Lab2/src/tests/tests.c -o /bin/shared/tests.o
+sudo gcc -c -fPIC swap.c -o /bin/shared/swap.o
+sudo gcc  -shared /bin/shared/revert_string.o /bin/shared/swap.o -o /bin/shared/libshared.so
+sudo gcc  /bin/shared/tests.o -L/bin/shared -lshared -o /bin/sharedlinkedtry -lcunit
+LD_LIBRARY_PATH=$(pwd)/bin/shared /bin/sharedlinkedtry
